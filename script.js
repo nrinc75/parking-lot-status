@@ -1,16 +1,4 @@
-// Firebase configuration object (replace with your actual Firebase config)
-const firebaseConfig = {
-  apiKey: "AIzaSyA3RGuZJJkAKFnZrbWzsnrLGFlJfH7njz4",
-  authDomain: "navalreactorsparking.firebaseapp.com",
-  projectId: "navalreactorsparking",
-  storageBucket: "navalreactorsparking.appspot.com",
-  messagingSenderId: "170552670421",
-  appId: "1:170552670421:web:892b9c0e9d669c04814a5c",
-  measurementId: "G-2H8L16MP0E"
-};
 
-// Initialize Firebase
-app.initializeApp(firebaseConfig);
 const db = app.firestore();
 
 // Mapping status to colors
