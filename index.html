@@ -4,15 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parking Lot Status</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        .lot-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin: 10px 0;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .green { background-color: green; }
+        .yellow { background-color: yellow; color: black; }
+        .red { background-color: red; }
+    </style>
 </head>
 <body>
-    <h1>Parking Lot Status</h1>
-    <div class="parking-lots">
-    <button id="lot1" class="parking-button" style="background-color: green;">Lot 1</button>
-    <button id="lot2" class="parking-button" style="background-color: green;">Lot 2</button>
-    <button id="lot3" class="parking-button" style="background-color: green;">Lot 3</button>
-    </div>
+    <h1>Bldg 104 Parking</h1>
+    <button id="bldg104north" class="lot-button">Bldg 104 North (GS-15/O-6/9:30am)</button>
+    <button id="bldg104south" class="lot-button">Bldg 104 South (GS-15/O-6/9:30am)</button>
+
+    <h1>Parking Garage</h1>
+    <button id="2nddeck" class="lot-button">2nd Deck</button>
+    <button id="3rddeck" class="lot-button">3rd Deck</button>
+    <button id="4thdeck" class="lot-button">4th Deck</button>
+    <button id="5thdeck" class="lot-button">5th Deck</button>
+    <button id="6thdeck" class="lot-button">6th Deck</button>
+    <button id="7thdeck" class="lot-button">7th Deck (Roof)</button>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
