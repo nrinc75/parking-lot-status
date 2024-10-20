@@ -10,8 +10,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+app.initializeApp(firebaseConfig);
+const db = app.firestore();
 
 // Mapping status to colors
 const statusToColor = {
