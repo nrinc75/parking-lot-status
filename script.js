@@ -35,7 +35,7 @@ function updateButtonColor(lotId, isFull) {
 
 // Event listeners for buttons
 document.addEventListener('DOMContentLoaded', () => {
-  const buttons = document.querySelectorAll('.lot-button');
+  const buttons = document.querySelectorAll('.parking-button');
   
   buttons.forEach((button) => {
     button.addEventListener('click', function () {
