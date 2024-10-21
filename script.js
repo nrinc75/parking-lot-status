@@ -47,7 +47,16 @@ loadParkingStatuses("bldg104", (id, data) => {
 
 // Load Parking Garage statuses
 loadParkingStatuses("parkingGarage", (id) => {
-  return id.toLowerCase().replace(/\s+/g, '');
+  const idMapping = {
+    "2nd Deck": "2nddeck",
+    "3rd Deck": "3rddeck",
+    "4th Deck": "4thdeck",
+    "5th Deck": "5thdeck",
+    "6th Deck": "6thdeck",
+    "7th Deck (Roof)": "7thdeck"
+  };
+  
+  return idMapping[id] || null; // Return null if no matching ID is found
 });
 
 // Function to handle button click and toggle parking status
