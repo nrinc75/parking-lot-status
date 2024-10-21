@@ -36,6 +36,12 @@ async function loadParkingStatuses(collectionName, idMapper) {
   querySnapshot.forEach((docSnapshot) => {
     const data = docSnapshot.data();
     const buttonId = idMapper(docSnapshot.id, data);
+    
+    if (!buttonId) {
+      console.error(`No matching button for document: ${docSnapshot.id}`);
+      return; // Skip if buttonId is undefined
+    }
+
     updateButtonColor(buttonId, data.statusNR);
   });
 }
