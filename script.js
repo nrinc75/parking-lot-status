@@ -67,39 +67,52 @@ loadParkingStatuses("parkingGarage", (id, data) => {
   return idMapping[data.floorName] || null; // Return null if no matching ID is found
 });
 
-// Helper function to map buttonId to floorName
+// Helper function to extract floor name from button ID
 function getFloorNameFromButtonId(buttonId) {
-  const floorNameMapping = {
-    "bldg104north": "Bldg 104 North (GS-15/O-6/9:30am)",
-    "bldg104south": "Bldg 104 South (GS-15/O-6/9:30am)",
-    "2nddeck": "2nd Deck",
-    "3rddeck": "3rd Deck",
-    "4thdeck": "4th Deck",
-    "5thdeck": "5th Deck",
-    "6thdeck": "6th Deck",
-    "7thdeck": "7th Deck (Roof)"
-  };
-
-  return floorNameMapping[buttonId];
-}
+  switch (buttonId) {
+    case "bldg104north":
+      return "Bldg 104 North (GS-15/O-6/9:30am)";
+    case "bldg104south":
+      return "Bldg 104 South (GS-15/O-6/9:30am)";
+    case "2nddeck":
+      return "2nd Deck";
+    case "3rddeck":
+      return "3rd Deck";
+    case "4thdeck":
+      return "4th Deck";
+    case "5thdeck":
+      return "5th Deck";
+    case "6thdeck":
+      return "6th Deck";
+    case "7thdeck":
+      return "7th Deck (Roof)";
+    default:
+      return ""; // Return empty string for unexpected IDs
+  }
 
 // Function to handle button click and toggle parking status
-async function handleLotStatusUpdate(buttonId, collection, currentStatus) {
+async function handleLotStatusUpdate(buttonId, currentStatus) {
   const nextStatus = getNextStatus(currentStatus);
 
-  // Find the document by the floorName field instead of the document ID
-  const q = query(collection(db, collection), where("floorName", "==", getFloorNameFromButtonId(buttonId)));
+  // Get the collection name based on the buttonId
+  const collectionName = buttonId.includes("bldg104") ? "bldg104" : "parkingGarage";
+
+  // Create a query for the document by floorName
+  const q = query(collection(db, collectionName), where("floorName", "==", getFloorNameFromButtonId(buttonId)));
+  console.log(`Querying for floorName: ${getFloorNameFromButtonId(buttonId)}`); // Debugging line
+
   const querySnapshot = await getDocs(q);
+  console.log(`Query Snapshot for ${getFloorNameFromButtonId(buttonId)}:`, querySnapshot); // Log the snapshot
 
   if (!querySnapshot.empty) {
-    const docSnapshot = querySnapshot.docs[0]; // Assuming only one document matches
+    const docSnapshot = querySnapshot.docs[0];
 
     await updateDoc(docSnapshot.ref, { statusNR: nextStatus });
 
     // Update the button color
-    updateButtonColor(buttonId, nextStatus);
+    updateButtonColor(buttonId, nextStatus); // Using buttonId directly for color update
   } else {
-    console.error("No matching document found for button: ", buttonId);
+    console.error("No matching document found for floorName: ", getFloorNameFromButtonId(buttonId));
   }
 }
 
