@@ -126,8 +126,8 @@ function getNextStatus(currentStatus) {
 // Attach event listeners to buttons
 document.addEventListener('DOMContentLoaded', () => {
   const bldg104Buttons = [
-    { id: "bldg104north", collection: "bldg104", doc: "north" },
-    { id: "bldg104south", collection: "bldg104", doc: "south" }
+    { id: "bldg104north", collection: "bldg104", doc: "bldg104north" },
+    { id: "bldg104south", collection: "bldg104", doc: "bldg104south" }
   ];
 
   const garageButtons = [
