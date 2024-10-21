@@ -84,15 +84,22 @@ function getFloorNameFromButtonId(buttonId) {
 }
 
 // Function to handle button click and toggle parking status
-async function handleLotStatusUpdate(lotId, collection, currentStatus) {
+async function handleLotStatusUpdate(buttonId, collection, currentStatus) {
   const nextStatus = getNextStatus(currentStatus);
-  
-  const docRef = doc(db, collection, lotId);
-  try {
-    await updateDoc(docRef, { statusNR: nextStatus });
-    updateButtonColor(lotId, nextStatus);
-  } catch (error) {
-    console.error("Error updating parking lot status: ", error);
+
+  // Find the document by the floorName field instead of the document ID
+  const q = query(collection(db, collection), where("floorName", "==", getFloorNameFromButtonId(buttonId)));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    const docSnapshot = querySnapshot.docs[0]; // Assuming only one document matches
+
+    await updateDoc(docSnapshot.ref, { statusNR: nextStatus });
+
+    // Update the button color
+    updateButtonColor(buttonId, nextStatus);
+  } else {
+    console.error("No matching document found for button: ", buttonId);
   }
 }
 
