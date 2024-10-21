@@ -62,9 +62,26 @@ loadParkingStatuses("parkingGarage", (id, data) => {
     "7th Deck (Roof)": "7thdeck"
   };
 
+  
   // Use the floorName field to map to the button IDs
   return idMapping[data.floorName] || null; // Return null if no matching ID is found
 });
+
+// Helper function to map buttonId to floorName
+function getFloorNameFromButtonId(buttonId) {
+  const floorNameMapping = {
+    "bldg104north": "Bldg 104 North (GS-15/O-6/9:30am)",
+    "bldg104south": "Bldg 104 South (GS-15/O-6/9:30am)",
+    "2nddeck": "2nd Deck",
+    "3rddeck": "3rd Deck",
+    "4thdeck": "4th Deck",
+    "5thdeck": "5th Deck",
+    "6thdeck": "6th Deck",
+    "7thdeck": "7th Deck (Roof)"
+  };
+
+  return floorNameMapping[buttonId];
+}
 
 // Function to handle button click and toggle parking status
 async function handleLotStatusUpdate(lotId, collection, currentStatus) {
