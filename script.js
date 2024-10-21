@@ -1,5 +1,20 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
-const db = app.firestore();
+// Firebase configuration 
+  const firebaseConfig = {
+    apiKey: "AIzaSyA3RGuZJJkAKFnZrbWzsnrLGFlJfH7njz4",
+    authDomain: "navalreactorsparking.firebaseapp.com",
+    projectId: "navalreactorsparking",
+    storageBucket: "navalreactorsparking.appspot.com",
+    messagingSenderId: "170552670421",
+    appId: "1:170552670421:web:892b9c0e9d669c04814a5c",
+    measurementId: "G-2H8L16MP0E"
+  };
+
+// Initialize Firebase app and Firestore
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Mapping status to colors
 const statusToColor = {
@@ -15,37 +30,37 @@ function updateButtonColor(buttonId, status) {
   button.className = `lot-button ${color}`;
 }
 
-// Load Bldg 104 parking lot statuses
-db.collection("bldg104").get().then((querySnapshot) => {
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    const buttonId = data.floorName.includes("North") ? "bldg104north" : "bldg104south";
+// Function to load parking statuses for a collection
+async function loadParkingStatuses(collectionName, idMapper) {
+  const querySnapshot = await getDocs(collection(db, collectionName));
+  querySnapshot.forEach((docSnapshot) => {
+    const data = docSnapshot.data();
+    const buttonId = idMapper(docSnapshot.id, data);
     updateButtonColor(buttonId, data.statusNR);
   });
+}
+
+// Load Bldg 104 parking lot statuses
+loadParkingStatuses("bldg104", (id, data) => {
+  return data.floorName.includes("North") ? "bldg104north" : "bldg104south";
 });
 
 // Load Parking Garage statuses
-db.collection("parkingGarage").get().then((querySnapshot) => {
-  querySnapshot.forEach((doc) => {
-    const buttonId = doc.id.toLowerCase().replace(/\s+/g, '');
-    const data = doc.data();
-    updateButtonColor(buttonId, data.statusNR);
-  });
+loadParkingStatuses("parkingGarage", (id) => {
+  return id.toLowerCase().replace(/\s+/g, '');
 });
 
 // Function to handle button click and toggle parking status
-function handleLotStatusUpdate(lotId, collection, currentStatus) {
+async function handleLotStatusUpdate(lotId, collection, currentStatus) {
   const nextStatus = getNextStatus(currentStatus);
   
-  db.collection(collection).doc(lotId).update({
-    statusNR: nextStatus
-  })
-  .then(() => {
+  const docRef = doc(db, collection, lotId);
+  try {
+    await updateDoc(docRef, { statusNR: nextStatus });
     updateButtonColor(lotId, nextStatus);
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("Error updating parking lot status: ", error);
-  });
+  }
 }
 
 // Function to cycle through the statuses
@@ -77,3 +92,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+    
