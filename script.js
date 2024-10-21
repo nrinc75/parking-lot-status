@@ -1,16 +1,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 // Firebase configuration 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA3RGuZJJkAKFnZrbWzsnrLGFlJfH7njz4",
-    authDomain: "navalreactorsparking.firebaseapp.com",
-    projectId: "navalreactorsparking",
-    storageBucket: "navalreactorsparking.appspot.com",
-    messagingSenderId: "170552670421",
-    appId: "1:170552670421:web:892b9c0e9d669c04814a5c",
-    measurementId: "G-2H8L16MP0E"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyA3RGuZJJkAKFnZrbWzsnrLGFlJfH7njz4",
+  authDomain: "navalreactorsparking.firebaseapp.com",
+  projectId: "navalreactorsparking",
+  storageBucket: "navalreactorsparking.appspot.com",
+  messagingSenderId: "170552670421",
+  appId: "1:170552670421:web:892b9c0e9d669c04814a5c",
+  measurementId: "G-2H8L16MP0E"
+};
 
 // Initialize Firebase app and Firestore
 const app = initializeApp(firebaseConfig);
@@ -61,7 +61,6 @@ loadParkingStatuses("parkingGarage", (id, data) => {
     "6th Deck": "6thdeck",
     "7th Deck (Roof)": "7thdeck"
   };
-
   
   // Use the floorName field to map to the button IDs
   return idMapping[data.floorName] || null; // Return null if no matching ID is found
@@ -89,6 +88,7 @@ function getFloorNameFromButtonId(buttonId) {
     default:
       return ""; // Return empty string for unexpected IDs
   }
+} // Missing closing brace was added here
 
 // Function to handle button click and toggle parking status
 async function handleLotStatusUpdate(buttonId, currentStatus) {
@@ -141,8 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentStatus = this.className.includes("green") ? "6+ Spaces"
                          : this.className.includes("yellow") ? "1-5 Spaces"
                          : "FULL";
-      handleLotStatusUpdate(doc, collection, currentStatus);
+      handleLotStatusUpdate(doc, currentStatus);
     });
   });
 });
-    
