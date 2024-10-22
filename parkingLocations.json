@@ -1,0 +1,50 @@
+[
+  {
+    "collection": "bldg104",
+    "floorName": "Bldg 104 North (GS-15/O-6/9:30am)",
+    "buttonID": "bldg104north",
+    "buttonLabel": "Bldg 104 North"
+  },
+  {
+    "collection": "bldg104",
+    "floorName": "Bldg 104 South (GS-15/O-6/9:30am)",
+    "buttonID": "bldg104south",
+    "buttonLabel": "Bldg 104 South"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "2nd Deck",
+    "buttonID": "2nddeck",
+    "buttonLabel": "2nd Deck"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "3rd Deck",
+    "buttonID": "3rddeck",
+    "buttonLabel": "3rd Deck"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "4th Deck",
+    "buttonID": "4thdeck",
+    "buttonLabel": "4th Deck"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "5th Deck",
+    "buttonID": "5thdeck",
+    "buttonLabel": "5th Deck"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "6th Deck",
+    "buttonID": "6thdeck",
+    "buttonLabel": "6th Deck"
+  },
+  {
+    "collection": "parkingGarage",
+    "floorName": "7th Deck (Roof)",
+    "buttonID": "7thdeck",
+    "buttonLabel": "7th Deck (Roof)"
+  }
+]
