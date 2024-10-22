@@ -2,7 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebas
 import { getFirestore, collection, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 // Firebase configuration 
-const firebaseConfig = { /* Your Firebase config here */ };
+const firebaseConfig = {
+  apiKey: "AIzaSyA3RGuZJJkAKFnZrbWzsnrLGFlJfH7njz4",
+  authDomain: "navalreactorsparking.firebaseapp.com",
+  projectId: "navalreactorsparking",
+  storageBucket: "navalreactorsparking.appspot.com",
+  messagingSenderId: "170552670421",
+  appId: "1:170552670421:web:892b9c0e9d669c04814a5c",
+  measurementId: "G-2H8L16MP0E"
+};
 
 // Initialize Firebase app and Firestore
 const app = initializeApp(firebaseConfig);
@@ -22,55 +30,52 @@ function updateButtonColor(buttonId, status) {
   button.className = `lot-button ${color}`;
 }
 
-// Lookup function: Get floorName from buttonID
-function getFloorNameFromButtonId(buttonId, data) {
-  const item = data.find(d => d.buttonID === buttonId);
-  return item ? item.floorName : null;
-}
-
-// Lookup function: Get buttonID from floorName
-function getButtonIdFromFloorName(floorName, data) {
-  const item = data.find(d => d.floorName === floorName);
-  return item ? item.buttonID : null;
-}
-
-// Load parking statuses and update the button colors
-async function loadParkingStatuses(collectionName, data) {
+// Function to load parking statuses for a collection
+async function loadParkingStatuses(collectionName, idMapper) {
   const querySnapshot = await getDocs(collection(db, collectionName));
   querySnapshot.forEach((docSnapshot) => {
-    const docData = docSnapshot.data();
-    const buttonId = getButtonIdFromFloorName(docData.floorName, data);
+    const data = docSnapshot.data();
+    const buttonId = idMapper(docSnapshot.id, data);
+    
     if (!buttonId) {
       console.error(`No matching button for document: ${docSnapshot.id}`);
-      return;
+      return; // Skip if buttonId is undefined
     }
-    updateButtonColor(buttonId, docData.statusNR);
+
+    updateButtonColor(buttonId, data.statusNR);
   });
 }
 
-// Function to handle button click and update parking status
-async function handleLotStatusUpdate(buttonId, currentStatus, data) {
-  const nextStatus = getNextStatus(currentStatus);
-  const floorName = getFloorNameFromButtonId(buttonId, data);
+// Helper function to extract floor name from button ID
+function getFloorNameFromButtonId(buttonId, locations) {
+  const location = locations.find(loc => loc.buttonID === buttonId);
+  return location ? location.floorName : "";
+}
 
-  if (!floorName) {
-    console.error(`No matching floorName for button: ${buttonId}`);
-    return;
-  }
+// Function to handle button click and toggle parking status
+async function handleLotStatusUpdate(buttonId, currentStatus, locations) {
+  const nextStatus = getNextStatus(currentStatus);
+  const floorName = getFloorNameFromButtonId(buttonId, locations);
 
   // Get the collection name based on the buttonId
-  const collectionName = buttonId.includes("bldg104") ? "bldg104" : "parkingGarage";
+  const collectionName = locations.find(loc => loc.buttonID === buttonId).collection;
 
-  // Query Firestore for the document by floorName
+  // Create a query for the document by floorName
   const q = query(collection(db, collectionName), where("floorName", "==", floorName));
+  console.log(`Querying for floorName: ${floorName}`); // Debugging line
+
   const querySnapshot = await getDocs(q);
+  console.log(`Query Snapshot for ${floorName}:`, querySnapshot); // Log the snapshot
 
   if (!querySnapshot.empty) {
     const docSnapshot = querySnapshot.docs[0];
+
     await updateDoc(docSnapshot.ref, { statusNR: nextStatus });
-    updateButtonColor(buttonId, nextStatus);
+
+    // Update the button color
+    updateButtonColor(buttonId, nextStatus); // Using buttonId directly for color update
   } else {
-    console.error(`No document found for floorName: ${floorName}`);
+    console.error("No matching document found for floorName: ", floorName);
   }
 }
 
@@ -81,30 +86,43 @@ function getNextStatus(currentStatus) {
   return "6+ Spaces"; // Reset to "6+ Spaces" after "FULL"
 }
 
-// Load the JSON file and dynamically generate HTML buttons
-fetch("parkingLocations.json")
-  .then(response => response.json())
-  .then(data => {
-    const container = document.body;
+// Function to dynamically create buttons based on JSON data
+function createButtons(parkingLocations) {
+  const container = document.body; // You can target a specific section of the HTML if needed
 
-    // Create buttons dynamically based on JSON data
-    data.forEach(item => {
-      const button = document.createElement("button");
-      button.id = item.buttonID;
-      button.textContent = item.buttonLabel;
-      button.className = "lot-button";
-      container.appendChild(button);
+  parkingLocations.forEach(location => {
+    const button = document.createElement("button");
+    button.id = location.buttonID;
+    button.innerText = location.buttonLabel;
+    button.className = "lot-button"; // Initial class, will be updated based on status
 
-      // Attach click event to each button
-      button.addEventListener("click", function () {
-        const currentStatus = this.className.includes("green") ? "6+ Spaces"
-                           : this.className.includes("yellow") ? "1-5 Spaces"
-                           : "FULL";
-        handleLotStatusUpdate(button.id, currentStatus, data);
-      });
+    // Attach click handler
+    button.addEventListener('click', () => {
+      const currentStatus = button.className.includes("green") ? "6+ Spaces"
+                         : button.className.includes("yellow") ? "1-5 Spaces"
+                         : "FULL";
+      handleLotStatusUpdate(button.id, currentStatus, parkingLocations);
     });
 
-    // Load parking statuses after creating the buttons
-    loadParkingStatuses("bldg104", data);
-    loadParkingStatuses("parkingGarage", data);
+    // Append button to the container
+    container.appendChild(button);
   });
+}
+
+// Function to load JSON and initialize the buttons
+async function loadParkingLocations() {
+  const response = await fetch('parkingLocations.json'); // Fetch the JSON file
+  const parkingLocations = await response.json(); // Parse JSON data
+
+  createButtons(parkingLocations); // Dynamically create buttons
+
+  // Now load Firestore data and update button statuses
+  parkingLocations.forEach(location => {
+    loadParkingStatuses(location.collection, (id, data) => {
+      return location.buttonID; // Use the buttonID from JSON to update status
+    });
+  });
+}
+
+// Ensure the script runs after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', loadParkingLocations);
